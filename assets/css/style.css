@@ -1,0 +1,155 @@
+body {
+    margin: 15px;
+    padding-top: 40px;
+}
+
+dd {
+    margin: 0;
+}
+
+dt {
+    margin-right: 10px;
+    float: left;
+    font-weight: bold;
+}
+
+
+.action-dialog.ui-dialog {
+    padding: 0 5px 2px 2px;
+}
+
+.action-dialog.ui-dialog .ui-dialog-content {
+    padding: 0;
+}
+
+.ui-dialog .actions>* {
+    margin-left: 5px;
+
+}
+
+.ui-dialog .actions>* {
+    text-decoration: none;
+    opacity: 0.6;
+}
+.ui-dialog .actions>a:focus {
+    outline: none;
+}
+
+.ui-dialog .actions>:hover {
+    opacity: 1;
+}
+
+.ui-dialog .favicon {
+    height: 16px;
+    width: 16px;
+}
+
+.definition-dialog.ui-dialog {
+    padding: 0;
+}
+
+.definition-dialog.ui-dialog .ui-dialog-titlebar {
+    padding: 0;
+    margin: 0;
+    background-color: #F7F7F7;
+    border-bottom: 1px solid #EBEBEB;
+}
+
+.definition-dialog.ui-dialog .ui-dialog-title {
+    margin: 0;
+    padding: 3px 10px;
+    font-size: 13px;
+    display: block;
+    float: none;
+}
+
+.definition-dialog.popover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.10);
+}
+
+.definition-dialog .ui-widget-content a {
+    color: #08C;
+}
+
+.definition-dialog .actions {
+    float: right;
+    margin-right: 16px;
+    visibility: hidden;
+}
+
+.definition-dialog:hover .actions {
+    visibility: visible;
+}
+
+.definition-dialog .sticky-btn {
+    cursor: pointer;
+}
+
+
+.section {
+    clear:both;
+    min-width: 200px;
+}
+
+.control-toolbar {
+    float: right;
+    padding-right: 5px;
+}
+
+.control-toolbar>* {
+    display: inline-block;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.control-toolbar .input-append {
+    font-size: 20px;
+}
+
+.control-toolbar .sections-controls input {
+    width: 20px;
+    text-align: center;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.invisible.hovered {
+    visibility: visible;
+}
+
+.definition:hover .invisible {
+    visibility: visible;
+}
+
+.snd {
+    text-decoration: none;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    background-image: url("../img/speaker.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    color: #369;
+    vertical-align: middle;
+}
+
+body #toc {
+    top: 40px;
+}
+
+
+@media print {
+    #toc,
+    .navbar,
+    .noprint {
+        display: none;
+    }
+
+    body {
+        margin: 15px;
+        font-size: 10px;
+    }
+}

@@ -1,0 +1,121 @@
+# KMDoc
+
+KMDoc is a software for an intelligent representation of knowledge. It can be used for effective learning or quick browsing and retrieval of useful knowledge. It can be used to represent knowledge of basically any science field. Is is also useful for languages and vocabularies. See essay about [learning](http://knomaton.org/learning.html) that describes underlying thoughts.
+
+Knowledge is first written down in plain text and then automatic tool extracts definitions of concepts and creates rich HTML page for viewing in browser, exports flashcards and so on.
+
+See examples:
+
+- [Graph Theory glossary]() - glossary of : This example among other features shows useful navigation in nested definitions.
+- [Chinese notes]()- Notes from chinese class. Vocabulary can be automatically pronounced using text-to-speech Google API.
+
+## Format
+
+The format is based on markdown. Using plain text has advantage that no extra software is needed and knowledge can be easily written in form of notes during a lecture.
+
+Here is an example:
+
+```
+# Heading 1
+## Heading 2
+
+*emphasize*
+
+concept a
+: here is definition
+
+concept b .. alternative notation (when using shortdef module)
+
+Force
+: any influence that causes an object to undergo a certain change, either concerning its movement, direction, or geometrical construction. 
+symbol: F
+formal: F = m * a
+
+```
+
+## Metadata
+
+You can specify metadata in YAML format.
+
+These are common fields of definition. Not all of these fields are yet used, but consider it a informal ontology for future applications.
+
+- name
+- definition, def - informal definition, this is default
+- formal - formal definition
+- symbol
+- alternatives, alias
+- introduction
+- note / notes
+- example, eg / examples
+- exercise, ex / exercises
+- tags
+- source - URL to source of definition
+- reference / references - links to other useful material
+- type - note, definition, vocabulary
+
+### Helpers
+
+You can specify helpers to transform property (it is inspired by [Variable Modifiers](http://www.smarty.net/docs/en/language.modifiers.tpl) for Smarty templates). 
+```
+B element
+: This element shows bold text
+example|html: <b>not bold</b>
+```
+
+Currently supported helpers are:
+
+- markdown (alias md) - Compile markdown markup
+- html - Escape html
+- upper - Covert string to upper-case
+- lower - Covert string to lower-case
+
+See [how to add new helper]().
+
+```
+
+## Usage
+
+To compile the knowledge file, create build file (usually named *build.js*). Here is the basic sample. First the instance is created (you can pass options object), then follows *use* method to specify which modules are to be used and finally the *build* method.
+
+```
+var kmd = require('./components/kmdoc').create();
+
+kmd.use(
+'shortdef', 'shortsource', 'toc', 'columns', 'tooltip', 'math', 'recall', 'autolink', 'search', 'flashcard');
+
+kmd.build();
+
+```
+
+### API
+
+Methods
+
+- build()
+- use(module*) - use module(s)
+	Options can be specified with object like this:
+	<code>kmd.use({flashcard: {out: 'outfile.csv'}});</code>
+- preprocess(fn) - add function to be called before transformation
+- postprocess(fn) - add function to be called after transformation
+- addStyle(filename) - add stylesheet to document
+- addScript(filename) - add script file to document
+- addHead(html) - add html code to &lt;head&gt; element
+
+Properties
+
+- fileIn - filename of an input file, default autodetect from commandline or in currenn working directory
+- fileOut - filename of an input file, default same basename as fileIn plus html extension
+- options
+	- encoding - input encoding, default utf-8
+	- baseUrl - prepends baseUrl for relative urls of scripts and links
+	- defTmpl - template used to render definition. It is a function with one parameter, returns string.
+	- defaultHelpers - array of helpers to be applied on every definition, default empty
+		example: ['upper', 'md']
+
+See [API doc]() for more information.
+
+### Modules
+
+Advanced functionality is added via modules for flexibility. See [Modules documentation]() to find out which modules are available.
+
+See the [cookbook]() for how to create your own module.

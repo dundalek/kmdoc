@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: modules.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: modules.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>
+var fs = require('fs'),
+    _  = require('underscore'),
+    helpers = require('./helpers');
+
+var flashcard = function(options) {
+    this.postprocess(function() {
+        var out = flashcard.generate(this.definitions),
+            fileOut = options.out || this.fileOut.replace(/\.html$/, '-flashcards.csv');
+
+        fs.writeFileSync(fileOut, out);
+    });
+};
+
+flashcard.csvEsc = function (str) {
+    return '"' + str.replace(/"/g, '""').replace(/\n/g, '&lt;br>') + '"';
+}
+
+flashcard.csvLine = function() {
+    return Array.prototype.map.call(arguments, flashcard.csvEsc).join(';');
+}
+
+flashcard.generate = function(defs) {
+    return defs.map(function(x) {
+        return flashcard.csvLine(x.name, x.definition, x.headers.map(helpers.normalizeTag).join(' '));
+    }).join('\n');
+}
+
+/** @exports KMDoc.modules */
+module.exports = {
+    /** Enable shorter way for definition with double dot */
+    shortdef: function() {
+        this.preprocess(function() {
+            this.input = this.input.replace(/^(.+?) *\.\. */gm, '\n$1\n:');
+        });
+    },
+    /** Allows shorter way to specify source with at-notation */
+    shortsource: function(options) {
+        var self = this,
+            fn = this.transformDef;
+        this.transformDef = function(def) {
+            def = fn.apply(self, def);
+            var r = /@[^ ]+/;
+            if (def.name.match(r)) {
+                def.source = def.name.match(r)[0];
+                def.name = def.name.replace(r, '');
+            }
+            return def;
+        }
+    },
+    /** Save definitions in CSV file for use as flashcards
+        @method */
+    flashcard: flashcard,
+    /** Enable dynamic table of contents */
+    toc: function(options) {
+        var side = options.side === 'left' ? 'left' : 'right';
+        this.addStyle('components/kmdoc/assets/css/toc.css');
+        this.addScript('components/kmdoc/assets/libs/jquery.toc.js');
+        this.addHead('&lt;script>$(function() {$("body").append("&lt;div id=\\"toc\\">&lt;/div>").css("margin-'+side+'", 160); $("#toc").css("'+side+'", 0).toc();});&lt;/script>');
+    },
+    /** Enable columns displaying */
+    columns: function() {
+        this.addScript('components/kmdoc/assets/libs/jquery.masonry.min.js');
+        this.addScript('components/kmdoc/assets/js/columns.js');
+        this.postprocess(function() {
+            this.output = this.output
+                    .replace(/(&lt;h[1-9])/g, '&lt;/div>&lt;div class="section">$1')
+                    .replace(/&lt;\/div>&lt;div class="section">(&lt;h[1-9])/, '&lt;div class="section">$1')
+                    .replace(/&lt;\/body>/, '&lt;/div>&lt;/body>');
+        });
+    },
+    /** Enable text-to-speech, useless without tooltip */
+    tts: function(options) {
+        options = _.extend({
+            lang: 'en',
+            transform: function(d) {
+                return d.name;
+            }}, options);
+        this.addHead('&lt;script>KMDoc.ttsLang = "'+options.lang+'"&lt;/script>');
+        this.addScript('components/kmdoc/assets/js/tts.js');
+    },
+    /** Enable tooltips */
+    tooltip: function() {
+        this.addScript('components/kmdoc/assets/js/tooltip.js');
+    },
+    /** Enable rendering of math formulas */
+    math: function(options) {
+        this.addScript('http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML');
+    },
+    /** Enable recall functionality */
+    recall: function() {
+        this.addScript('components/kmdoc/assets/js/recall.js');
+    },
+    /** Enable auto-linking */
+    autolink: function(options) {
+        this.addScript('components/kmdoc/assets/js/autolink.js');
+    },
+    /** Enable instant search */
+    search: function(options) {
+        this.addScript('components/kmdoc/assets/js/search.js');
+    }
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="helpers.html">helpers</a></li><li><a href="modules.html">modules</a></li><li><a href="module-KMDoc.html">KMDoc</a></li></ul><h3>Classes</h3><ul><li><a href="KMDocInst.html">KMDocInst</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Mar 29 2013 21:12:39 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+</body>
+</html>
