@@ -44,6 +44,14 @@ kmd.modules.yourModuleName = function(options) {
 kmd.use('yourModuleName');
 ```
 
+## Add helper
+
+```javascript
+kmd.helpers.capitalize = function(str) {
+    return str[0].toUpperCase()+str.slice(1);
+};
+```
+
 ## Add action to tooltip
 
 If you want to link definition to other than default sources (Google, Wikipedia, etc.) you can create custom action.

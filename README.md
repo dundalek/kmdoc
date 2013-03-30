@@ -6,8 +6,8 @@ Knowledge is first written down in plain text and then automatic tool extracts d
 
 See examples:
 
-- [Graph Theory glossary]() - glossary of : This example among other features shows useful navigation in nested definitions.
-- [Chinese notes]()- Notes from chinese class. Vocabulary can be automatically pronounced using text-to-speech Google API.
+- [Graph Theory glossary](http://kb.knomaton.org/graph-theory/graph-theory.html) - This example among other features shows useful navigation in nested definitions.
+- [Chinese notes](http://kb.knomaton.org/chinese/out/chinese.html) - Notes from chinese class. Vocabulary can be automatically pronounced using text-to-speech Google API.
 
 ## Format
 
@@ -30,12 +30,11 @@ Force
 : any influence that causes an object to undergo a certain change, either concerning its movement, direction, or geometrical construction. 
 symbol: F
 formal: F = m * a
-
 ```
 
 ## Metadata
 
-You can specify metadata in YAML format.
+You can specify metadata in [YAML](http://en.wikipedia.org/wiki/YAML) format.
 
 These are common fields of definition. Not all of these fields are yet used, but consider it a informal ontology for future applications.
 
@@ -69,22 +68,19 @@ Currently supported helpers are:
 - upper - Covert string to upper-case
 - lower - Covert string to lower-case
 
-See [how to add new helper]().
-
-```
+See [how to add new helper](https://github.com/knomaton/kmdoc/blob/master/doc/cookbook.md#add-helper).
 
 ## Usage
 
 To compile the knowledge file, create build file (usually named *build.js*). Here is the basic sample. First the instance is created (you can pass options object), then follows *use* method to specify which modules are to be used and finally the *build* method.
 
-```
+```javascript
 var kmd = require('./components/kmdoc').create();
 
 kmd.use(
 'shortdef', 'shortsource', 'toc', 'columns', 'tooltip', 'math', 'recall', 'autolink', 'search', 'flashcard');
 
 kmd.build();
-
 ```
 
 ### API
@@ -112,10 +108,10 @@ Properties
 	- defaultHelpers - array of helpers to be applied on every definition, default empty
 		example: ['upper', 'md']
 
-See [API doc]() for more information.
+See [API doc](http:/kb.knomaton.org/ap/index.html) for more information.
 
 ### Modules
 
-Advanced functionality is added via modules for flexibility. See [Modules documentation]() to find out which modules are available.
+Advanced functionality is added via modules for flexibility. See [Modules documentation](https://github.com/knomaton/kmdoc/blob/master/doc/modules.md) to find out which modules are available.
 
-See the [cookbook]() for how to create your own module.
+See the [cookbook](https://github.com/knomaton/kmdoc/blob/master/doc/cookbook.md#writing-modules) for how to create your own module.
