@@ -108,7 +108,7 @@ Properties
 	- defaultHelpers - array of helpers to be applied on every definition, default empty
 		example: ['upper', 'md']
 
-See [API doc](http:/kb.knomaton.org/ap/index.html) for more information.
+See [API doc](http://kb.knomaton.org/api/KMDocInst.html) for more information.
 
 ### Modules
 
