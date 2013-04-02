@@ -10,6 +10,8 @@ KMDoc.module({
 
         function update() {
             $('.sections-controls input').val(columns);
+            var w = $('body').width()/columns;
+            $('.section').css('max-width', w);
             $('body').masonry();
         }
 

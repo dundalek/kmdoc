@@ -1,6 +1,6 @@
 
 KMDoc.module({
-    name: 'columns',
+    name: 'recall',
     options: {
         template: _.template('<div class="learn-controls btn-group"><button class="btn active" title="Show everything">both</button><button class="btn" title="Show only terms without definitions">terms</button><button class="btn" title="Show only definitions without terms">definitions</button></div>')
     },
