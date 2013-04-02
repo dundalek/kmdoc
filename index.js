@@ -40,7 +40,7 @@ _.extend(KMDocInst.prototype,
         componentsPath: 'components/',
         defTmpl: _.template('\n<div class="definition" id="<%= id %>"><dt><%= name %></dt><dd><%= definition %></dd></div>\n'),
         fileTmpl: _.template('<!DOCTYPE html>\n<html>\n<head>\n <meta charset="utf-8"/>\n<%= head %>\n</head>\n<body>\n\n<%= content %>\n\n</body>\n</html>\n'),
-        defaultHelpers: []
+        defaultHelpers: ['trim']
     },
     /** Run building process */
     build: function() {
@@ -136,6 +136,7 @@ _.extend(KMDocInst.prototype,
                 // handle and store definition
                 def.definition = buf.join('\n');
                 def = this.transformDef(def);
+                this._addToIndex(def);
                 defs.push(def);
                 // render definition to output
                 out.push(this.options.defTmpl(def));
@@ -170,19 +171,6 @@ _.extend(KMDocInst.prototype,
             }
         }
 
-        // generate unique id
-        var id = this.helpers.normalizeTag(def.name);   
-        if (id in this.defsIdx) {
-            for (var j = 2; true; j+=1) {
-                if (!(id+'-'+j in this.defsIdx)) {
-                    id = id+'-'+j;
-                    break;
-                }
-            }
-        }
-        def.id = id;
-        this.defsIdx[id] = def;
-
         return def;
     },
     /** Use specified modules
@@ -193,7 +181,7 @@ _.extend(KMDocInst.prototype,
             if (typeof mod === 'function') {
                 // function apply directly
                 mod.call(self);
-            } else {                
+            } else {
                 if (typeof mod === 'string') {
                     var tmp = {};
                     tmp[mod] = {};
@@ -252,7 +240,7 @@ _.extend(KMDocInst.prototype,
                 case 'script':
                     return '<script src="'+self._url(x.value)+'"></script>';
             }
-            return x.value;        
+            return x.value;
         }).join('');
     },
     /** Automatic filename detection
@@ -314,6 +302,21 @@ _.extend(KMDocInst.prototype,
     _parseHelpers: function(str) {
         return str.split('|');
     },
+    /** Create unique ID and add to index */
+    _addToIndex: function(def) {
+        // generate unique id
+        var id = this.helpers.normalizeTag(def.name);
+        if (id in this.defsIdx) {
+            for (var j = 2; true; j+=1) {
+                if (!(id+'-'+j in this.defsIdx)) {
+                    id = id+'-'+j;
+                    break;
+                }
+            }
+        }
+        def.id = id;
+        this.defsIdx[id] = def;
+    }
 });
 
 /** @module KMDoc */

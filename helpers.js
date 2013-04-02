@@ -30,6 +30,10 @@ var helpers = {
 	lower: function(str) {
 		return str.toLowerCase();
 	},
+	/** Trim whitespace from string */
+	trim: function(str) {
+        return str.replace(/^\s+|\s+$/g, '');
+    },
 	/** Convert string to latin characters 
 	    @method */
 	latinize: latinize,

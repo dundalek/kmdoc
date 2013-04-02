@@ -39,11 +39,11 @@ module.exports = {
         var self = this,
             fn = this.transformDef;
         this.transformDef = function(def) {
-            def = fn.apply(self, def);
+            def = fn.call(self, def);
             var r = /@[^ ]+/;
             if (def.name.match(r)) {
-                def.source = def.name.match(r)[0];
-                def.name = def.name.replace(r, '');
+                def.source = helpers.trim(def.name.match(r)[0]);
+                def.name = helpers.trim(def.name.replace(r, ''));
             }
             return def;
         }
