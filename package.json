@@ -10,6 +10,7 @@
   "dependencies" : {
     "marked": "*",
     "underscore": "*",
-    "yamljs": "*"
+    "yamljs": "*",
+    "latinize": "*"
   }
 }

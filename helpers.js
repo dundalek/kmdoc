@@ -3,7 +3,7 @@ var os = require('os'),
 	fs = require('fs'),
     _  = require('underscore'),
     marked = require('marked'),
-    latinize = require('./latinize');
+    latinize = require('latinize');
 
 var math_r = /(\\\(.*?[^\\]\\\)|\\\[.*?[^\\]\\\])/g;
 
@@ -17,6 +17,10 @@ var helpers = {
 		});
 		// do the markdown conversion
 		return marked(str);
+	},
+	/** Inline markdown - strip beginning and ending paragraph element */
+	imd: function(str) {
+		return helpers.markdown(str).replace(/^\s*<p>\s*(.*?)\s*<\/p>\s*$/, '$1');
 	},
 	/** Escape html */
 	html: function(str) {

@@ -69,7 +69,7 @@ _.extend(KMDocInst.prototype,
         // include and save extracted definitions
         fs.writeFileSync(this.options.basename + '-definitions.json', JSON.stringify(this.defsIdx));
 
-        this.addHead('<script>KMDoc.definitionsUrl = "'+this.options.basename+'-definitions.json";</script>');
+        this.addHead('<script>KMDoc.definitionsUrl = "' + (this.options.basename.match(/[^\/]+$/)[0]) + '-definitions.json";</script>');
 
         // convert with markdown
         this.output = this.options.fileTmpl({
