@@ -7,12 +7,7 @@ var fs = require('fs'),
     helpers = require('./helpers');
 
 /** @class KMDocInst */
-function KMDocInst(fileIn, options) {
-    if (typeof fileIn === 'object' && typeof options === 'undefined') {
-        options = fileIn;
-        fileIn = undefined;
-    }
-    this.fileIn = fileIn;
+function KMDocInst(options) {
     this.options = _.extend({}, this.options, options);
     this._head = [];
     this._preprocess = [];
@@ -35,21 +30,29 @@ _.extend(KMDocInst.prototype,
     modules: modules,
     helpers: helpers,
     options: {
+        fileIn: '',
+        fileOut: '',
+        basename: '',
+        title: '',
+        lang: 'en',
         encoding: 'utf-8',
         baseUrl: '',
         componentsPath: 'components/',
         defTmpl: _.template('\n<div class="definition" id="<%= id %>"><dt><%= name %></dt><dd><%= definition %></dd></div>\n'),
-        fileTmpl: _.template('<!DOCTYPE html>\n<html>\n<head>\n <meta charset="utf-8"/>\n<%= head %>\n</head>\n<body>\n\n<%= content %>\n\n</body>\n</html>\n'),
+        fileTmpl: _.template('<!DOCTYPE html>\n<html lang="<%= options.lang %>">\n<head>\n <meta charset="<%= options.encoding %>"/>\n <title><%= options.title %></title><%= head %>\n</head>\n<body>\n\n<%= content %>\n\n</body>\n</html>\n'),
         defaultHelpers: ['trim']
     },
     /** Run building process */
     build: function() {
         // ensure filenames
-        if (!this.fileIn) {
-            this.fileIn = this._detectFilename();
+        if (!this.options.fileIn) {
+            this.options.fileIn = this._detectFilename();
         }
-        if (!this.fileOut) {
-            this.fileOut = this.fileIn.replace(/\.md$/,'.html');
+        if (!this.options.basename) {
+            this.options.basename = this.options.fileIn.replace(/\.md$/, '');
+        }
+        if (!this.options.fileOut) {
+            this.options.fileOut = this.options.basename + '.html';
         }
 
         this.load();
@@ -64,23 +67,27 @@ _.extend(KMDocInst.prototype,
         this.definitions = tmp.definitions;
 
         // include and save extracted definitions
-        fs.writeFileSync(this.fileOut.replace(/\.html$/, '-definitions.json'), JSON.stringify(this.defsIdx));
+        fs.writeFileSync(this.options.basename + '-definitions.json', JSON.stringify(this.defsIdx));
+
+        this.addHead('<script>KMDoc.definitionsUrl = "'+this.options.basename+'-definitions.json";</script>');
 
         // convert with markdown
-        this.output = this._applyHelpers('HTML header: '+this._buildAssets()+'\n\n'+this.input, ['md']);
-
-        this.output = this.options.fileTmpl({head: this._buildAssets(), content: this._applyHelpers(this.input, ['md'])});
+        this.output = this.options.fileTmpl({
+            options: this.options,
+            head: this._buildAssets(),
+            content: this._applyHelpers(this.input, ['md'])
+        });
 
         this._applyFns(this._postprocess);
         this.save();
     },
     /** Load file into memory */
     load: function() {
-        this.input = fs.readFileSync(this.fileIn, this.options.encoding);
+        this.input = fs.readFileSync(this.options.fileIn, this.options.encoding);
     },
     /** Save file */
     save: function() {
-        fs.writeFileSync(this.fileOut, this.output);
+        fs.writeFileSync(this.options.fileOut, this.output);
     },
     /** Parse and extract definitions from input string
         @param {string} str */
@@ -323,8 +330,8 @@ _.extend(KMDocInst.prototype,
 
 module.exports = {
     /** Factory method to create instance */
-    create: function(fileIn, options) {
-        return new KMDocInst(fileIn, options);
+    create: function(options) {
+        return new KMDocInst(options);
     },
     template: _.template
 };

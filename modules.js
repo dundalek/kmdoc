@@ -6,7 +6,7 @@ var fs = require('fs'),
 var flashcard = function(options) {
     this.postprocess(function() {
         var out = flashcard.generate(this.definitions),
-            fileOut = options.out || this.fileOut.replace(/\.html$/, '-flashcards.csv');
+            fileOut = options.out || this.options.basename + '-flashcards.csv';
 
         fs.writeFileSync(fileOut, out);
     });
