@@ -6,7 +6,9 @@ KMDoc.module({
         truncate: 30
     },
     init: function(options) {
-      var values = _.values(KMDoc.definitions);
+      var values = _.values(KMDoc.definitions).map(function(x) {
+        return {name: latinize(x.name), id: x.id};
+      });
 
       KMDoc.controlBar
         .append(options.template())
@@ -23,8 +25,9 @@ KMDoc.module({
             return false;
           },
           source: function( request, response ) {
+            var term = latinize(request.term);
             // filter matching entries
-            var matcher = new RegExp( $.ui.autocomplete.escapeRegex( request.term ), "i" );
+            var matcher = new RegExp( $.ui.autocomplete.escapeRegex( term ), "i" );
             var ret = $.grep( values, function( value ) {
               //value = value.label || value.value || value;
               //return matcher.test( value ) || matcher.test( normalize( value ) );
@@ -32,10 +35,12 @@ KMDoc.module({
             });
 
             // items that match beginning are sorted first
-            var sorter = new RegExp( '^' + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+            var sorter = new RegExp( '^' + $.ui.autocomplete.escapeRegex( term ), "i" );
             ret.sort(function(a,b) {
               return +sorter.test(b.name) - +sorter.test(a.name);
             });
+
+            ret = ret.map(function(x) {return KMDoc.definitions[x.id]});
 
             response( ret );
           },open: function(){

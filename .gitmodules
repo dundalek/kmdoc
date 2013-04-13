@@ -1,0 +1,9 @@
+[submodule "assets/libs/snowball-js"]
+	path = assets/libs/snowball-js
+	url = git://github.com/fortnightlabs/snowball-js.git
+[submodule "assets/libs/czech-stemmer"]
+	path = assets/libs/czech-stemmer
+	url = git://github.com/dundalek/czech-stemmer.git
+[submodule "assets/libs/latinize"]
+	path = assets/libs/latinize
+	url = git://github.com/dundalek/latinize.git

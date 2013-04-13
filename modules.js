@@ -94,9 +94,40 @@ module.exports = {
     /** Enable auto-linking */
     autolink: function(options) {
         this.addScript(this.options.componentsPath+'kmdoc/assets/js/autolink.js');
+        var lang = this.options.lang.slice(0,2);
+        if (lang === 'cs') {
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/czech-stemmer/stringbuffer.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/czech-stemmer/agressive.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/czech-stemmer/light.js');
+            this.addHead('<script>KMDoc.modules.autolink.options.stem = function(str) {return czech_stem(str.toLowerCase());}; </script>');
+        } else if (lang in snowballStemmers) {
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/snowball-js/stemmer/src/Among.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/snowball-js/stemmer/src/SnowballProgram.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/snowball-js/stemmer/src/ext/'+snowballStemmers[lang]+'Stemmer.js');
+            this.addHead('<script>KMDoc.modules.autolink.options.stem = (function() {var stemmer = new '+snowballStemmers[lang]+'Stemmer(); return function(str) {stemmer.setCurrent(str.toLowerCase()); stemmer.stem(); return stemmer.getCurrent();}})(); </script>');
+        }
     },
     /** Enable instant search */
     search: function(options) {
+        this.addScript(this.options.componentsPath+'kmdoc/assets/libs/latinize/latinize.js');
         this.addScript(this.options.componentsPath+'kmdoc/assets/js/search.js');
     }
+};
+
+var snowballStemmers = {
+    'da':'Danish',
+    'nl':'Dutch',
+    'en':'English',
+    'fi':'Finnish',
+    'fr':'French',
+    'de':'German',
+    'hu':'Hungarian',
+    'it':'Italian',
+    'no':'Norwegian',
+    'pt':'Portuguese',
+    'ro':'Romanian',
+    'ru':'Russian',
+    'es':'Spanish',
+    'sv':'Swedish',
+    'tr':'Turkish'
 };
