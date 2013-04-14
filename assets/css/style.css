@@ -136,6 +136,19 @@ dt {
     vertical-align: middle;
 }
 
+a.source {
+    text-decoration: none;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    background-image: url("../img/network-workgroup.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+}
+
+
 body #toc {
     top: 40px;
 }

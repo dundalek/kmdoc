@@ -27,7 +27,7 @@ concept a
 concept b .. alternative notation (when using shortdef module)
 
 Force
-: any influence that causes an object to undergo a certain change, either concerning its movement, direction, or geometrical construction. 
+: any influence that causes an object to undergo a certain change, either concerning its movement, direction, or geometrical construction.
 symbol: F
 formal: F = m * a
 ```
@@ -42,7 +42,7 @@ These are common fields of definition. Not all of these fields are yet used, but
 - definition, def - informal definition, this is default
 - formal - formal definition
 - symbol
-- alternatives, alias
+- alias
 - introduction
 - note / notes
 - example, eg / examples
@@ -52,9 +52,19 @@ These are common fields of definition. Not all of these fields are yet used, but
 - reference / references - links to other useful material
 - type - note, definition, vocabulary
 
+### Metadata usage
+
+Here is a list of metadata, which are currently used and have functional meaning:
+
+**name** - name of the definition and title of the popup
+**definition** - definition and contents of the popup
+**symbol**, **alias** - used for autolinking
+**source** - used to link to source. You can link web pages, PDF, doc and other formats supported by [Google docs viewer](http://docs.google.com/viewer). You can add page number with hash sign to open document at specified page. For example source link lecture.pdf#5 will open the document on page 5. Check out the [shortsource](https://github.com/knomaton/kmdoc/blob/master/doc/modules.md#shortsource) module how to specify sources more easily.
+
+
 ### Helpers
 
-You can specify helpers to transform property (it is inspired by [Variable Modifiers](http://www.smarty.net/docs/en/language.modifiers.tpl) for Smarty templates). 
+You can specify helpers to transform property (it is inspired by [Variable Modifiers](http://www.smarty.net/docs/en/language.modifiers.tpl) for Smarty templates).
 ```
 B element
 : This element shows bold text

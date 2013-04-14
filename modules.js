@@ -42,7 +42,7 @@ module.exports = {
             def = fn.call(self, def);
             var r = /@[^ ]+/;
             if (def.name.match(r)) {
-                def.source = helpers.trim(def.name.match(r)[0]);
+                def.source = helpers.trim(def.name.match(r)[0]).slice(1);
                 def.name = helpers.trim(def.name.replace(r, ''));
             }
             return def;

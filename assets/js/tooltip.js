@@ -12,11 +12,49 @@
         };
     }
 
+    var supportedFiles = ["JPEG", "PNG", "GIF", "TIFF", "BMP", "MPEG4", "3GPP", "MOV", "AVI", "MPEGPS", "WMV", "FLV", "ogg", "DOC", "DOCX", "XLS", "XLSX", "PPT", "PPTX", "PDF", "TIFF", "SVG", "EPS", "PS", "TTF", "XPS"],
+        file_r = new RegExp('('+supportedFiles.join('|')+')(#[0-9]+)?$','i'),
+        sourceTmpl = _.template('<a href="<%=source%>" title="Link to source" target="_blank" class="source"></a>');
+
+    function sourceLink(def) {
+        if (!def.source) {
+            return '';
+        }
+
+        var source = def.source,
+            m,
+            filetype,
+            page;
+
+        if (m = source.match(file_r)) {
+            filetype = m[1].slice(1).toLowerCase();
+            if (!source.match(/^https?:\/\//)) {
+                // relative link, make it absolute from current location
+                source = window.location.href.replace(/\/[^\/]+$/)+'/'+source;
+            }
+
+            // embedded=true for embedded view - make it configurable?
+            source = 'http://docs.google.com/viewer?url='+encodeURIComponent(source.replace(m[2], ''));
+
+            if (m[2]) {
+                page = parseInt(m[2].slice(1), 10);
+                // when embedded-true, the id is like :0.page.5 instead of :t.page.5
+                page = '#:t.page.'+(page-1);
+                source += page;
+            }
+        }
+
+        return sourceTmpl({
+            source: source
+        });
+    }
+
     KMDoc.module({
         name: 'tooltip',
         options: {
             template: _.template('<div class="input-append"><input id="searchbox" type="text"><span class="add-on"><i class="icon-search"></i></span></div>'),
             actions: [
+                sourceLink,
                 linkFactory('See on Wikipedia', 'http://en.wikipedia.org/w/index.php?search=<%=name%>'),
                 linkFactory('Search on Google', 'http://www.google.com/search?query=<%=name%>'),
                 linkFactory('See on WolframAlpha', 'http://www.wolframalpha.com/input/?i=<%=name%>')
@@ -24,7 +62,7 @@
             small: true,
             big: true
         },
-        linkFactory: linkFactory,    
+        linkFactory: linkFactory,
         init: function(options) {
             if (options.small) {
                 this.initActionDialog(options);
@@ -46,7 +84,7 @@
             actionDialog.data('dialog').uiDialog.find('.ui-dialog-titlebar').remove();
 
             // TODO: _.debouce(fn, 250)
-            
+
             $('body')
                 .on('mouseenter', '.definition dt', function(ev) {
                     var id = $(ev.currentTarget).parent().attr('id'),
@@ -55,7 +93,7 @@
                     var dia = actionDialog.data('dialog');
                     dia.element.html('<span class="actions">'+options.actions.map(function(x) {return x(d)}).join('')+'</span>');
 
-                    actionDialog    
+                    actionDialog
                         .dialog( "option", "position", { my: "center bottom+2", at: "center top", of: $(ev.currentTarget) } )
                         .dialog( "open" );
 
@@ -120,7 +158,7 @@
                         dia.data('autolink-parent').data('autolink-dialog', null);
                         dia.dialog('destroy').remove();
                     }
-                    
+
                 })
                 .on('click', '.definition-dialog', function(ev) {
                     var dia = $('.ui-dialog-content', ev.currentTarget);
