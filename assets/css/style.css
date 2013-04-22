@@ -18,6 +18,11 @@ div[id] {
     padding-top: 40px;
 }
 
+div[id]#toc {
+    margin-top: 0;
+    padding-top: 0;
+}
+
 .action-dialog.ui-dialog {
     padding: 0 5px 2px 2px;
 }
