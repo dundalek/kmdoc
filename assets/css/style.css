@@ -13,6 +13,10 @@ dt {
     font-weight: bold;
 }
 
+div[id] {
+    margin-top: -40px;
+    padding-top: 40px;
+}
 
 .action-dialog.ui-dialog {
     padding: 0 5px 2px 2px;

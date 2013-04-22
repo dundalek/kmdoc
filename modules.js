@@ -56,7 +56,7 @@ module.exports = {
         var side = options.side === 'left' ? 'left' : 'right';
         this.addStyle(this.options.componentsPath+'kmdoc/assets/css/toc.css');
         this.addScript(this.options.componentsPath+'kmdoc/assets/libs/jquery.toc.js');
-        this.addHead('<script>$(function() {$("body").append("<div id=\\"toc\\"></div>").css("margin-'+side+'", 160); $("#toc").css("'+side+'", 0).toc();});</script>');
+        this.addHead('<script>$(function() {$("body").append("<div id=\\"toc\\"></div>").css("margin-'+side+'", 160); $("#toc").css("'+side+'", 0).toc({offset:-40});});</script>');
     },
     /** Enable columns displaying */
     columns: function() {
