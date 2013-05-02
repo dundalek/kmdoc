@@ -12,7 +12,6 @@ KMDoc.module = function(mod) {
 
 $(function() {
 
-    $('body').append('<div class="navbar navbar-inverse navbar-fixed-top"><div class="navbar-inner"><div class="control-toolbar"></div></div></div>');
     KMDoc.controlBar = $('.control-toolbar');
 
     $.getJSON(KMDoc.definitionsUrl, function(data) {

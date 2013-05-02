@@ -39,7 +39,7 @@ _.extend(KMDocInst.prototype,
         baseUrl: '',
         componentsPath: 'components/',
         defTmpl: _.template('\n<div class="definition" id="<%= id %>"><dt><%= name %></dt><dd><%= definition %></dd></div>\n'),
-        fileTmpl: _.template('<!DOCTYPE html>\n<html lang="<%= options.lang %>">\n<head>\n <meta charset="<%= options.encoding %>"/>\n <title><%= options.title %></title><%= head %>\n</head>\n<body>\n\n<%= content %>\n\n</body>\n</html>\n'),
+        fileTmpl: _.template('<!DOCTYPE html>\n<html lang="<%= options.lang %>">\n<head>\n <meta charset="<%= options.encoding %>"/>\n <title><%= options.title %></title><%= head %>\n</head>\n<body>\n\n<div class="navbar navbar-inverse navbar-fixed-top"><div class="navbar-inner"><a class="brand" href="#"><%= options.title %></a><div class="control-toolbar"></div></div></div>\n\n<%= content %>\n\n</body>\n</html>\n'),
         defaultHelpers: ['trim']
     },
     /** Run building process */

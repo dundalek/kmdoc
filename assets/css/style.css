@@ -3,6 +3,11 @@ body {
     padding-top: 40px;
 }
 
+.navbar .brand {
+    display: inline-block;
+    margin-left: 5px;
+}
+
 dd {
     margin: 0;
 }
