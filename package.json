@@ -1,19 +1,22 @@
 {
   "name": "kmdoc",
   "version": "0.1.0",
-  "author": "Jakub Dundalek <dundalek@gmail.com>",
-  "description": "KMDoc is a software for an intelligent representation of knowledge.",
   "author": "Jakub Dundalek <dundalek@gmail.com> (http://dundalek.com/)",
+  "description": "KMDoc is a software for an intelligent representation of knowledge.",
   "homepage": "http://github.com/knomaton/kmdoc",
   "repository": {
     "type": "git",
     "url": "http://github.com/knomaton/kmdoc.git"
   },
-  "dependencies" : {
+  "dependencies": {
     "marked": "*",
     "underscore": "*",
     "yamljs": "*",
     "latinize": "*"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "shelljs": "~0.2.6",
+    "jsdoc": "~3.2.1"
+  }
 }

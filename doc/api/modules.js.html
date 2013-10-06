@@ -33,7 +33,7 @@ var fs = require('fs'),
 var flashcard = function(options) {
     this.postprocess(function() {
         var out = flashcard.generate(this.definitions),
-            fileOut = options.out || this.fileOut.replace(/\.html$/, '-flashcards.csv');
+            fileOut = options.out || this.options.basename + '-flashcards.csv';
 
         fs.writeFileSync(fileOut, out);
     });
@@ -66,11 +66,11 @@ module.exports = {
         var self = this,
             fn = this.transformDef;
         this.transformDef = function(def) {
-            def = fn.apply(self, def);
+            def = fn.call(self, def);
             var r = /@[^ ]+/;
             if (def.name.match(r)) {
-                def.source = def.name.match(r)[0];
-                def.name = def.name.replace(r, '');
+                def.source = helpers.trim(def.name.match(r)[0]).slice(1);
+                def.name = helpers.trim(def.name.replace(r, ''));
             }
             return def;
         }
@@ -81,14 +81,14 @@ module.exports = {
     /** Enable dynamic table of contents */
     toc: function(options) {
         var side = options.side === 'left' ? 'left' : 'right';
-        this.addStyle('components/kmdoc/assets/css/toc.css');
-        this.addScript('components/kmdoc/assets/libs/jquery.toc.js');
-        this.addHead('&lt;script>$(function() {$("body").append("&lt;div id=\\"toc\\">&lt;/div>").css("margin-'+side+'", 160); $("#toc").css("'+side+'", 0).toc();});&lt;/script>');
+        this.addStyle(this.options.componentsPath+'kmdoc/assets/css/toc.css');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/libs/jquery.toc.js');
+        this.addHead('&lt;script>$(function() {$("body").append("&lt;div id=\\"toc\\">&lt;/div>").css("margin-'+side+'", 160); $("#toc").css("'+side+'", 0).toc({offset:-40});});&lt;/script>');
     },
     /** Enable columns displaying */
     columns: function() {
-        this.addScript('components/kmdoc/assets/libs/jquery.masonry.min.js');
-        this.addScript('components/kmdoc/assets/js/columns.js');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/libs/jquery.masonry.min.js');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/js/columns.js');
         this.postprocess(function() {
             this.output = this.output
                     .replace(/(&lt;h[1-9])/g, '&lt;/div>&lt;div class="section">$1')
@@ -104,11 +104,11 @@ module.exports = {
                 return d.name;
             }}, options);
         this.addHead('&lt;script>KMDoc.ttsLang = "'+options.lang+'"&lt;/script>');
-        this.addScript('components/kmdoc/assets/js/tts.js');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/js/tts.js');
     },
     /** Enable tooltips */
     tooltip: function() {
-        this.addScript('components/kmdoc/assets/js/tooltip.js');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/js/tooltip.js');
     },
     /** Enable rendering of math formulas */
     math: function(options) {
@@ -116,16 +116,47 @@ module.exports = {
     },
     /** Enable recall functionality */
     recall: function() {
-        this.addScript('components/kmdoc/assets/js/recall.js');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/js/recall.js');
     },
     /** Enable auto-linking */
     autolink: function(options) {
-        this.addScript('components/kmdoc/assets/js/autolink.js');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/js/autolink.js');
+        var lang = this.options.lang.slice(0,2);
+        if (lang === 'cs') {
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/czech-stemmer/stringbuffer.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/czech-stemmer/agressive.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/czech-stemmer/light.js');
+            this.addHead('&lt;script>KMDoc.modules.autolink.options.stem = function(str) {return czech_stem(str.toLowerCase());}; &lt;/script>');
+        } else if (lang in snowballStemmers) {
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/snowball-js/stemmer/src/Among.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/snowball-js/stemmer/src/SnowballProgram.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/libs/snowball-js/stemmer/src/ext/'+snowballStemmers[lang]+'Stemmer.js');
+            this.addHead('&lt;script>KMDoc.modules.autolink.options.stem = (function() {var stemmer = new '+snowballStemmers[lang]+'Stemmer(); return function(str) {stemmer.setCurrent(str.toLowerCase()); stemmer.stem(); return stemmer.getCurrent();}})(); &lt;/script>');
+        }
     },
     /** Enable instant search */
     search: function(options) {
-        this.addScript('components/kmdoc/assets/js/search.js');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/libs/latinize/latinize.js');
+        this.addScript(this.options.componentsPath+'kmdoc/assets/js/search.js');
     }
+};
+
+var snowballStemmers = {
+    'da':'Danish',
+    'nl':'Dutch',
+    'en':'English',
+    'fi':'Finnish',
+    'fr':'French',
+    'de':'German',
+    'hu':'Hungarian',
+    'it':'Italian',
+    'no':'Norwegian',
+    'pt':'Portuguese',
+    'ro':'Romanian',
+    'ru':'Russian',
+    'es':'Spanish',
+    'sv':'Swedish',
+    'tr':'Turkish'
 };</code></pre>
         </article>
     </section>
@@ -136,15 +167,16 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="helpers.html">helpers</a></li><li><a href="modules.html">modules</a></li><li><a href="module-KMDoc.html">KMDoc</a></li></ul><h3>Classes</h3><ul><li><a href="KMDocInst.html">KMDocInst</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="helpers.html">helpers</a></li><li><a href="modules.html">modules</a></li><li><a href="module-KMDoc.html">KMDoc</a></li></ul><h3>Classes</h3><ul><li><a href="KMDocInst.html">KMDocInst</a></li></ul><h3>Global</h3><ul><li><a href="global.html#flashcard">flashcard</a></li><li><a href="global.html#latinize">latinize</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Mar 29 2013 21:12:39 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.1</a> on Sun Oct 06 2013 17:47:03 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>

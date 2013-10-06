@@ -34,22 +34,21 @@ var fs = require('fs'),
     helpers = require('./helpers');
 
 /** @class KMDocInst */
-function KMDocInst(fileIn, options) {
-    this.fileIn = fileIn;
+function KMDocInst(options) {
     this.options = _.extend({}, this.options, options);
     this._head = [];
     this._preprocess = [];
     this._postprocess = [];
 
-    this.addStyle('components/bootstrap/css/bootstrap.css');
-    this.addStyle('components/kmdoc/assets/css/style.css');
-    //this.addStyle('components/jquery-ui/themes/cupertino/jquery-ui.css');
-    this.addStyle('components/kmdoc/assets/jquery-bootstrap/jquery-ui-1.9.2.custom.css');
+    this.addStyle(this.options.componentsPath+'bootstrap/css/bootstrap.css');
+    this.addStyle(this.options.componentsPath+'kmdoc/assets/css/style.css');
+    //this.addStyle(this.options.componentsPath+'jquery-ui/themes/cupertino/jquery-ui.css');
+    this.addStyle(this.options.componentsPath+'kmdoc/assets/jquery-bootstrap/jquery-ui-1.9.2.custom.css');
 
     this.addScript('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
-    this.addScript('components/jquery-ui/ui/jquery-ui.js');
-    this.addScript('components/underscore/underscore.js');
-    this.addScript('components/kmdoc/assets/js/main.js');
+    this.addScript(this.options.componentsPath+'jquery-ui/ui/jquery-ui.js');
+    this.addScript(this.options.componentsPath+'underscore/underscore.js');
+    this.addScript(this.options.componentsPath+'kmdoc/assets/js/main.js');
 }
 
 _.extend(KMDocInst.prototype,
@@ -58,20 +57,29 @@ _.extend(KMDocInst.prototype,
     modules: modules,
     helpers: helpers,
     options: {
+        fileIn: '',
+        fileOut: '',
+        basename: '',
+        title: '',
+        lang: 'en',
         encoding: 'utf-8',
         baseUrl: '',
+        componentsPath: 'components/',
         defTmpl: _.template('\n&lt;div class="definition" id="&lt;%= id %>">&lt;dt>&lt;%= name %>&lt;/dt>&lt;dd>&lt;%= definition %>&lt;/dd>&lt;/div>\n'),
-        fileTmpl: _.template('&lt;!DOCTYPE html>\n&lt;html>\n&lt;head>\n &lt;meta charset="utf-8"/>\n&lt;%= head %>\n&lt;/head>\n&lt;body>\n\n&lt;%= content %>\n\n&lt;/body>\n&lt;/html>\n'),
-        defaultHelpers: [],
+        fileTmpl: _.template('&lt;!DOCTYPE html>\n&lt;html lang="&lt;%= options.lang %>">\n&lt;head>\n &lt;meta charset="&lt;%= options.encoding %>"/>\n &lt;title>&lt;%= options.title %>&lt;/title>&lt;%= head %>\n&lt;/head>\n&lt;body>\n\n&lt;div class="navbar navbar-inverse navbar-fixed-top">&lt;div class="navbar-inner">&lt;a class="brand" href="#">&lt;%= options.title %>&lt;/a>&lt;div class="control-toolbar">&lt;/div>&lt;/div>&lt;/div>\n\n&lt;%= content %>\n\n&lt;/body>\n&lt;/html>\n'),
+        defaultHelpers: ['trim']
     },
     /** Run building process */
     build: function() {
         // ensure filenames
-        if (!this.fileIn) {
-            this.fileIn = this._detectFilename();
+        if (!this.options.fileIn) {
+            this.options.fileIn = this._detectFilename();
         }
-        if (!this.fileOut) {
-            this.fileOut = this.fileIn.replace(/\.md$/,'.html');
+        if (!this.options.basename) {
+            this.options.basename = this.options.fileIn.replace(/\.md$/, '');
+        }
+        if (!this.options.fileOut) {
+            this.options.fileOut = this.options.basename + '.html';
         }
 
         this.load();
@@ -86,23 +94,27 @@ _.extend(KMDocInst.prototype,
         this.definitions = tmp.definitions;
 
         // include and save extracted definitions
-        fs.writeFileSync(this.fileOut.replace(/\.html$/, '-definitions.json'), JSON.stringify(this.defsIdx));
+        fs.writeFileSync(this.options.basename + '-definitions.json', JSON.stringify(this.defsIdx));
+
+        this.addHead('&lt;script>KMDoc.definitionsUrl = "' + (this.options.basename.match(/[^\/]+$/)[0]) + '-definitions.json";&lt;/script>');
 
         // convert with markdown
-        this.output = this._applyHelpers('HTML header: '+this._buildAssets()+'\n\n'+this.input, ['md']);
-
-        this.output = this.options.fileTmpl({head: this._buildAssets(), content: this._applyHelpers(this.input, ['md'])});
+        this.output = this.options.fileTmpl({
+            options: this.options,
+            head: this._buildAssets(),
+            content: this._applyHelpers(this.input, ['md'])
+        });
 
         this._applyFns(this._postprocess);
         this.save();
     },
     /** Load file into memory */
     load: function() {
-        this.input = fs.readFileSync(this.fileIn, this.options.encoding);
+        this.input = fs.readFileSync(this.options.fileIn, this.options.encoding);
     },
     /** Save file */
     save: function() {
-        fs.writeFileSync(this.fileOut, this.output);
+        fs.writeFileSync(this.options.fileOut, this.output);
     },
     /** Parse and extract definitions from input string
         @param {string} str */
@@ -158,6 +170,7 @@ _.extend(KMDocInst.prototype,
                 // handle and store definition
                 def.definition = buf.join('\n');
                 def = this.transformDef(def);
+                this._addToIndex(def);
                 defs.push(def);
                 // render definition to output
                 out.push(this.options.defTmpl(def));
@@ -192,19 +205,6 @@ _.extend(KMDocInst.prototype,
             }
         }
 
-        // generate unique id
-        var id = this.helpers.normalizeTag(def.name);   
-        if (id in this.defsIdx) {
-            for (var j = 2; true; j+=1) {
-                if (!(id+'-'+j in this.defsIdx)) {
-                    id = id+'-'+j;
-                    break;
-                }
-            }
-        }
-        def.id = id;
-        this.defsIdx[id] = def;
-
         return def;
     },
     /** Use specified modules
@@ -215,7 +215,7 @@ _.extend(KMDocInst.prototype,
             if (typeof mod === 'function') {
                 // function apply directly
                 mod.call(self);
-            } else {                
+            } else {
                 if (typeof mod === 'string') {
                     var tmp = {};
                     tmp[mod] = {};
@@ -274,7 +274,7 @@ _.extend(KMDocInst.prototype,
                 case 'script':
                     return '&lt;script src="'+self._url(x.value)+'">&lt;/script>';
             }
-            return x.value;        
+            return x.value;
         }).join('');
     },
     /** Automatic filename detection
@@ -336,14 +336,29 @@ _.extend(KMDocInst.prototype,
     _parseHelpers: function(str) {
         return str.split('|');
     },
+    /** Create unique ID and add to index */
+    _addToIndex: function(def) {
+        // generate unique id
+        var id = this.helpers.normalizeTag(def.name);
+        if (id in this.defsIdx) {
+            for (var j = 2; true; j+=1) {
+                if (!(id+'-'+j in this.defsIdx)) {
+                    id = id+'-'+j;
+                    break;
+                }
+            }
+        }
+        def.id = id;
+        this.defsIdx[id] = def;
+    }
 });
 
 /** @module KMDoc */
 
 module.exports = {
     /** Factory method to create instance */
-    create: function(fileIn, options) {
-        return new KMDocInst(fileIn, options);
+    create: function(options) {
+        return new KMDocInst(options);
     },
     template: _.template
 };</code></pre>
@@ -356,15 +371,16 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="helpers.html">helpers</a></li><li><a href="modules.html">modules</a></li><li><a href="module-KMDoc.html">KMDoc</a></li></ul><h3>Classes</h3><ul><li><a href="KMDocInst.html">KMDocInst</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="helpers.html">helpers</a></li><li><a href="modules.html">modules</a></li><li><a href="module-KMDoc.html">KMDoc</a></li></ul><h3>Classes</h3><ul><li><a href="KMDocInst.html">KMDocInst</a></li></ul><h3>Global</h3><ul><li><a href="global.html#flashcard">flashcard</a></li><li><a href="global.html#latinize">latinize</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Mar 29 2013 21:12:39 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.1</a> on Sun Oct 06 2013 17:47:03 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
 </body>
 </html>
