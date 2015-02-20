@@ -13,7 +13,7 @@ var flashcard = function(options) {
 };
 
 flashcard.csvEsc = function (str) {
-    return '"' + str.replace(/"/g, '""').replace(/\n/g, '<br>') + '"';
+    return '"' + String(str).replace(/"/g, '""').replace(/\n/g, '<br>') + '"';
 }
 
 flashcard.csvLine = function() {

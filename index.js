@@ -113,35 +113,28 @@ _.extend(KMDocInst.prototype,
                 // line contains definition
                 var def = {
                     name: out.pop(),
-                    headers: headers
+                    headers: headers,
+                    definition: ''
                 };
-                var buf = [line.replace(/^\s*:/, '')];
+                var buf = [line.replace(/^\s*:\s*/, 'definition: ')];
                 i += 1;
                 // load all lines until blank line to buffer
                 while (i < lines.length) {
                     line = lines[i];
-                    if (line.match(/^\s*$/)) {
+                    if (line === '') {
                         break;
                     } else {
                         buf.push(line);
                     }
                     i += 1;
                 }
-                // split buffer into definition body and properties
-                for (var j = 0; j < buf.length; j+=1) {
-                    if (buf[j].match(/^[^ ]+:/)) {
-                        // parse the properties with YAML
-                        try {
-                        _.extend(def, YAML.parse(buf.slice(j).join('\n')));
-                        } catch (e) {
-                            console.log('YAML error:', e);
-                        }
-                        buf = buf.slice(0,j);
-                        break;
-                    }
+                // parse the properties with YAML
+                try {
+                    _.extend(def, YAML.parse(buf.join('\n')));
+                } catch (e) {
+                    console.log('YAML error:', e, '\nin text:\n' + buf.join('\n'));
                 }
                 // handle and store definition
-                def.definition = buf.join('\n');
                 def = this.transformDef(def);
                 this._addToIndex(def);
                 defs.push(def);
