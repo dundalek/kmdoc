@@ -80,6 +80,10 @@ KMDoc.module({
 							break;
 						}
 					}
+					// we had no match, just append text to output
+					if (j === arr.length) {
+					  output.push(tokens[i].text);
+					}
 				}
 
 			}
