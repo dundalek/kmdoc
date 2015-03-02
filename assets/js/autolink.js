@@ -124,12 +124,9 @@ KMDoc.module({
 		});
 
 		// TODO: use workers or batching so we do not block main thread
-
-		$('.definition dd').each(function() {
-			autoElement(this);
-		});
-
-		$('.section>*:not(.definition,h1,h2,h3,h4,h5,h6)').each(function() {
+		$('p,li,dd').filter(function() {
+			return $(this).parents('dd').length === 0;
+		}).each(function() {
 			autoElement(this);
 		});
 
