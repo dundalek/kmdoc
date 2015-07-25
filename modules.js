@@ -1,9 +1,9 @@
 
 var fs = require('fs'),
     _  = require('underscore'),
-    markmap = require('markmap/parse.markdown'),
     helpers = require('./helpers');
 
+/* == flashcard functionality == */
 var flashcard = function(options) {
     this.postprocess(function() {
         var out = flashcard.generate(this.definitions),
@@ -25,6 +25,58 @@ flashcard.generate = function(defs) {
     return defs.map(function(x) {
         return flashcard.csvLine(x.name, x.definition, x.headers.map(helpers.normalizeTag).join(' '));
     }).join('\n');
+}
+
+/* == mindmap functionality == */
+var markmap = require('markmap/parse.markdown');
+var SEP = '_-__-_';
+
+function mindmap(options) {
+    var fileOut = options.out || this.options.basename + '-mindmap.json';
+    this.postprocess(function() {
+        var defIndex = {};
+        _.each(this.definitions, function(d) {
+            var idx = d.headers.join(SEP);
+            defIndex[idx] = defIndex[idx] || [];
+            defIndex[idx].push({
+                name: d.name,
+                textId: d.id,
+                isDefinition: true
+            });
+        });
+        var root = markmap(this.input);
+        traverseMindmap(root, [], defIndex);
+        
+        fs.writeFileSync(fileOut, JSON.stringify(root));
+    });
+    options.mindmapUrl = fileOut;
+    this.addStyle(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.css');
+    this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/node_modules/d3/d3.min.js');
+    this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.js');
+    this.addScript(this.options.componentsPath+'kmdoc/assets/js/mindmap.js');
+    this.addHead('<script>_.extend(KMDoc.modules.mindmap.options, ' + JSON.stringify(options) + ');</script>');
+}
+
+function traverseMindmap(node, stack, defIndex) {
+    if (node.name) {
+        stack.push(node.name);
+        var defs = defIndex[stack.join(SEP)];
+        if (defs) {
+            node.children = node.children || [];
+            [].push.apply(node.children, defs);
+        }
+        if (!node.id) {
+            node.textId = helpers.normalizeTag(node.name);
+        }
+    }
+    if (node.children) {
+        node.children.forEach(function(child) {
+            traverseMindmap(child, stack, defIndex);
+        });
+    }
+    if (node.name) {
+        stack.pop();
+    }
 }
 
 /** @exports KMDoc.modules */
@@ -114,19 +166,7 @@ module.exports = {
         this.addScript(this.options.componentsPath+'kmdoc/assets/js/search.js');
     },
     /** Enable mindmaps */
-    mindmap: function(options) {
-        this.preprocess(function() {
-            var fileOut = options.out || this.options.basename + '-mindmap.json';
-            var out = JSON.stringify(markmap(this.input));
-            fs.writeFileSync(fileOut, out);
-            options.mindmapUrl = fileOut;
-            this.addStyle(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.css');
-            this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/node_modules/d3/d3.min.js');
-            this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.js');
-            this.addScript(this.options.componentsPath+'kmdoc/assets/js/mindmap.js');
-            this.addHead('<script>_.extend(KMDoc.modules.mindmap.options, ' + JSON.stringify(options) + ');</script>');
-        });
-    }
+    mindmap: mindmap
 };
 
 var snowballStemmers = {

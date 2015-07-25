@@ -91,3 +91,12 @@ Automatically links occurences for interconnected terms.
 ### search
 
 Adds search functionality.
+
+### mindmap
+
+Enable mind map. It can be used for quick overview and navigation.
+
+Options:
+- autoOpen: default true
+- autoResize: default false
+- margin: default 50

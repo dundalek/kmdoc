@@ -64,11 +64,13 @@
         },
         linkFactory: linkFactory,
         init: function(options) {
+            this.options = options;
             if (options.small) {
                 this.initActionDialog(options);
             }
             if (options.big) {
-                this.initDefinitionDialog(options);
+                this.initDefinitionDialog();
+                this.initDefinitionDialogTrigger('.autolink');
             }
         },
         initActionDialog: function(options) {
@@ -107,51 +109,61 @@
                     actionDialog.dialog( "close" );
                 });
         },
-        initDefinitionDialog: function(options) {
-            function defDialog(ev, sticky) {
-                var id = $(ev.currentTarget).attr('href').substr(1),
-                    d = KMDoc.definitions[id];
+        openDefinitionDialog: function(id, parentElement, sticky) {
+            var d = KMDoc.definitions[id];
 
-                var dia = $('<div style="display:inline-block"></div>').dialog({
-                    autoOpen: false,
-                    width: '400',
-                    height: 'auto',
-                    minHeight: 10,
-                    dialogClass: 'definition-dialog popover',
-                    dragStart: function(event, ui) {
-                        var dia = $(this);
-                        if (dia.data('autolink-parent')) {
-                            dia.data('autolink-parent').data('autolink-dialog', null);
-                            dia.data('autolink-parent', null)
-                        }
-                    },
-                    close: function( event, ui ) {
-                        $(this).dialog('destroy').remove();
+            var dia = $('<div style="display:inline-block"></div>').dialog({
+                autoOpen: false,
+                width: '400',
+                height: 'auto',
+                minHeight: 10,
+                dialogClass: 'definition-dialog popover',
+                dragStart: function(event, ui) {
+                    var dia = $(this);
+                    if (dia.data('autolink-parent')) {
+                        dia.data('autolink-parent').data('autolink-dialog', null);
+                        dia.data('autolink-parent', null)
                     }
-
-                });
-
-                dia
-                    .html($('#'+id+' dd').html())
-                    .dialog( "option", "title", '<a href="#'+id+'">'+d.name+'</a><span class="actions">'+options.actions.map(function(x) {return x(d)}).join('')+'<span class="sticky-btn" title="Make this popover sticky"><i class="icon-magnet favicon"></i></span></span>')
-                    .dialog( "option", "position", { my: "center bottom+2", at: "center top", of: $(ev.currentTarget) } )
-                    .dialog( "open" );
-
-                if (!sticky) {
-                    dia.data('autolink-parent', $(ev.currentTarget));
-                    $(ev.currentTarget).data('autolink-dialog', dia);
+                },
+                close: function( event, ui ) {
+                    $(this).dialog('destroy').remove();
                 }
-            }
 
-            // definitionDialog
+            });
+
+            dia
+                .html($('#'+id+' dd').html())
+                .dialog( "option", "title", '<a href="#'+id+'">'+d.name+'</a><span class="actions">'+this.options.actions.map(function(x) {return x(d)}).join('')+'<span class="sticky-btn" title="Make this popover sticky"><i class="icon-magnet favicon"></i></span></span>')
+                .dialog( "option", "position", { my: "center bottom+2", at: "center top", of: $(parentElement) } )
+                .dialog( "open" );
+
+            if (!sticky) {
+                dia.data('autolink-parent', $(parentElement));
+                $(parentElement).data('autolink-dialog', dia);
+            }
+        },
+        initDefinitionDialogTrigger: function(selector) {
+            var self = this;
             $('body')
-                .on('mouseenter', '.autolink', function(ev) {
-                    defDialog(ev, false);
+                .on('mouseenter', selector, function(ev) {
+                    self.openDefinitionDialog($(ev.currentTarget).attr('href').substr(1), ev.currentTarget, false);
                 })
-                .on('click', '.autolink', function(ev) {
-                    defDialog(ev, true);
+                .on('click', selector, function(ev) {
+                    self.openDefinitionDialog($(ev.currentTarget).attr('href').substr(1), ev.currentTarget, false);
                     ev.preventDefault();
                 })
+                .on('mouseleave', selector, function(ev) {
+                    var dia = $(ev.currentTarget).data('autolink-dialog');
+                    if (dia) {
+                        if (!$(dia.data('dialog').uiDialog).is(ev.toElement) && !$(dia.data('dialog').uiDialog).has(ev.toElement).length) {
+                            $(ev.currentTarget).data('autolink-dialog', null);
+                            dia.dialog('destroy').remove();
+                        }
+                    }
+                })
+        },
+        initDefinitionDialog: function() {
+            $('body')
                 .on('mouseleave', '.definition-dialog', function(ev) {
                     var dia = $('.ui-dialog-content', ev.currentTarget);
                     if (dia.data('autolink-parent')) {
@@ -162,18 +174,9 @@
                 })
                 .on('click', '.definition-dialog', function(ev) {
                     var dia = $('.ui-dialog-content', ev.currentTarget);
-                    if (dia.data('autolink-parent')) {
+                    if (dia.data('autolink-parent') && !$(ev.target).parents().andSelf().is('.ui-dialog-title')) {
                         dia.data('autolink-parent').data('autolink-dialog', null);
                         dia.data('autolink-parent', null)
-                    }
-                })
-                .on('mouseleave', '.autolink', function(ev) {
-                    var dia = $(ev.currentTarget).data('autolink-dialog');
-                    if (dia) {
-                        if (!$(dia.data('dialog').uiDialog).is(ev.toElement) && !$(dia.data('dialog').uiDialog).has(ev.toElement).length) {
-                            $(ev.currentTarget).data('autolink-dialog', null);
-                            dia.dialog('destroy').remove();
-                        }
                     }
                 })
                 .on('click', '.definition-dialog .sticky-btn', function(ev) {

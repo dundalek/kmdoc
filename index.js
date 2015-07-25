@@ -103,7 +103,7 @@ _.extend(KMDocInst.prototype,
             if (line.match(/^#/)) {
                 // line contains header, parse it and store it in the hierarchy
                 var n = line.match(/^#+/)[0].length-1;
-                var h = line.replace(/^\s+|\s+$/g, '').replace(/^#+/, '');
+                var h = line.replace(/^\s+|\s+$/g, '').replace(/^#+/, '').trim();
                 headers = headers.slice(0, n+1);
                 headers[n] = h;
                 headers = headers.filter(function(x) {return x});
