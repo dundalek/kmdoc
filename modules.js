@@ -1,6 +1,7 @@
 
 var fs = require('fs'),
     _  = require('underscore'),
+    markmap = require('markmap/parse.markdown'),
     helpers = require('./helpers');
 
 var flashcard = function(options) {
@@ -111,6 +112,20 @@ module.exports = {
     search: function(options) {
         this.addScript(this.options.componentsPath+'kmdoc/assets/libs/latinize/latinize.js');
         this.addScript(this.options.componentsPath+'kmdoc/assets/js/search.js');
+    },
+    /** Enable mindmaps */
+    mindmap: function(options) {
+        this.preprocess(function() {
+            var fileOut = options.out || this.options.basename + '-mindmap.json';
+            var out = JSON.stringify(markmap(this.input));
+            fs.writeFileSync(fileOut, out);
+            options.mindmapUrl = fileOut;
+            this.addStyle(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.css');
+            this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/node_modules/d3/d3.min.js');
+            this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.js');
+            this.addScript(this.options.componentsPath+'kmdoc/assets/js/mindmap.js');
+            this.addHead('<script>_.extend(KMDoc.modules.mindmap.options, ' + JSON.stringify(options) + ');</script>');
+        });
     }
 };
 

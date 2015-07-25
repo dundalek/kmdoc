@@ -9,6 +9,7 @@
     "url": "http://github.com/dundalek/kmdoc.git"
   },
   "dependencies": {
+    "markmap": "^0.1.0",
     "latinize": "^0.1.0",
     "marked": "^0.3.3",
     "underscore": "^1.8.1",
