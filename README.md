@@ -59,7 +59,7 @@ Here is a list of metadata, which are currently used and have functional meaning
 **name** - name of the definition and title of the popup
 **definition** - definition and contents of the popup
 **symbol**, **alias** - used for autolinking
-**source** - used to link to source. You can link web pages, PDF, doc and other formats supported by [Google docs viewer](http://docs.google.com/viewer). You can add page number with hash sign to open document at specified page. For example source link lecture.pdf#5 will open the document on page 5. Check out the [shortsource](https://github.com/knomaton/kmdoc/blob/master/doc/modules.md#shortsource) module how to specify sources more easily.
+**source** - used to link to source. You can link web pages, PDF, doc and other formats supported by [Google docs viewer](http://docs.google.com/viewer). You can add page number with hash sign to open document at specified page. For example source link lecture.pdf#5 will open the document on page 5. Check out the [shortsource](https://github.com/dundalek/kmdoc/blob/master/doc/modules.md#shortsource) module how to specify sources more easily.
 
 
 ### Helpers
@@ -78,7 +78,7 @@ Currently supported helpers are:
 - upper - Covert string to upper-case
 - lower - Covert string to lower-case
 
-See [how to add new helper](https://github.com/knomaton/kmdoc/blob/master/doc/cookbook.md#add-helper).
+See [how to add new helper](https://github.com/dundalek/kmdoc/blob/master/doc/cookbook.md#add-helper).
 
 ## Usage
 
@@ -122,6 +122,6 @@ See [API doc](http://kb.knomaton.org/api/KMDocInst.html) for more information.
 
 ### Modules
 
-Advanced functionality is added via modules for flexibility. See [Modules documentation](https://github.com/knomaton/kmdoc/blob/master/doc/modules.md) to find out which modules are available.
+Advanced functionality is added via modules for flexibility. See [Modules documentation](https://github.com/dundalek/kmdoc/blob/master/doc/modules.md) to find out which modules are available.
 
-See the [cookbook](https://github.com/knomaton/kmdoc/blob/master/doc/cookbook.md#writing-modules) for how to create your own module.
+See the [cookbook](https://github.com/dundalek/kmdoc/blob/master/doc/cookbook.md#writing-modules) for how to create your own module.
