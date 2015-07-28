@@ -25,7 +25,7 @@
                     .appendTo(document.body)
                     .dialog({
                         closeOnEscape: true,
-                        autoOpen: options.autoOpen,
+                        autoOpen: true,
                         resizable: !options.autoResize,
                         modal: false,
                         width: $(window).width() - 2 * options.margin,
@@ -49,41 +49,16 @@
                             event.preventDefault();
                         }
                     });
-                    
+
+                KMDoc.modules.mindmap.initMindmap(d3.select(".mindmap"), data);
+
+                if (!options.autoOpen) {
+                    dialog.dialog('widget').hide();
+                }
+
                 if (options.autoResize) {
                     $(window).resize(_.debounce(updateDialog, 250));
                 }
-                    
-                markmap(d3.select(".mindmap"), data);
-                
-                var nodes = d3.selectAll('.markmap g.node');
-                var toggleHandler = nodes.on('click');
-                nodes.on('click', null);
-                nodes.selectAll('circle').on('click', toggleHandler);
-                
-                var selector = '.markmap g.node text';
-                KMDoc.modules.tooltip.initDefinitionDialogTrigger(selector);
-                $('body').off('click', selector).off('mouseenter', selector);
-                
-                nodes.selectAll('text')
-                    .on('mouseenter', function(d) {
-                        if (d.isDefinition) {
-                            KMDoc.modules.tooltip.openDefinitionDialog(d.textId, d3.event.currentTarget, false);
-                        }
-                    })
-                    .on('dblclick', function(d) {
-                        location.hash = d.textId;
-                        dialog.dialog('close');
-                        d3.event.stopPropagation();
-                    })
-                    .on('click', function(d) {
-                        if (d.isDefinition) {
-                            KMDoc.modules.tooltip.openDefinitionDialog(d.textId, d3.event.currentTarget, true);
-                            d3.event.preventDefault();
-                        } else {
-                            location.hash = d.textId;
-                        }
-                    });
                     
                 $('body').on('dblclick', '.definition-dialog .ui-dialog-title a', function(ev) {
                     dialog.dialog('close');
@@ -96,6 +71,38 @@
                         dialog.dialog('widget').toggle();
                     });
             });
+        },
+        initMindmap: function(el, data) {
+            markmap(el, data);
+            
+            var nodes = d3.selectAll('.markmap g.node');
+            var toggleHandler = nodes.on('click');
+            nodes.on('click', null);
+            nodes.selectAll('circle').on('click', toggleHandler);
+            
+            var selector = '.markmap g.node text';
+            KMDoc.modules.tooltip.initDefinitionDialogTrigger(selector);
+            $('body').off('click', selector).off('mouseenter', selector);
+            
+            nodes.selectAll('text')
+                .on('mouseenter', function(d) {
+                    if (d.isDefinition) {
+                        KMDoc.modules.tooltip.openDefinitionDialog(d.textId, d3.event.currentTarget, false);
+                    }
+                })
+                .on('dblclick', function(d) {
+                    location.hash = d.textId;
+                    dialog.dialog('close');
+                    d3.event.stopPropagation();
+                })
+                .on('click', function(d) {
+                    if (d.isDefinition) {
+                        KMDoc.modules.tooltip.openDefinitionDialog(d.textId, d3.event.currentTarget, true);
+                        d3.event.preventDefault();
+                    } else {
+                        location.hash = d.textId;
+                    }
+                });
         }
     });
 })();
