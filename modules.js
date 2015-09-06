@@ -28,7 +28,8 @@ flashcard.generate = function(defs) {
 }
 
 /* == mindmap functionality == */
-var markmap = require('markmap/parse.markdown');
+var markmapParse = require('markmap/parse.markdown');
+var markmapTransform = require('markmap/transform.headings');
 var SEP = '_-__-_';
 
 function mindmap(options) {
@@ -44,10 +45,10 @@ function mindmap(options) {
                 isDefinition: true
             });
         });
-        var root = markmap(this.input);
+        var root = markmapTransform(markmapParse(this.input));
         traverseMindmap(root, [], defIndex);
         
-        fs.writeFileSync(fileOut, JSON.stringify(root));
+        fs.writeFileSync(fileOut, JSON.stringify(root, null, '  '));
     });
     options.mindmapUrl = fileOut;
     this.addStyle(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.css');

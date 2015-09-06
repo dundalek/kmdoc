@@ -5,6 +5,10 @@
         options: {
             autoOpen: true,
             autoResize: false,
+            markmapOptions: {
+                autoFit: true,
+                preset: 'colorful'
+            },
             margin: 50
         },
         init: function(options) {
@@ -20,7 +24,7 @@
                         .position({ my: 'center', at: 'center', of: window });
                 }
                 
-                var dialog = $('<div class="mindmap" title="Mind Map"></div>');
+                var dialog = $('<div class="mindmap" title="Mind Map"><svg style="height: 100%; width: 100%"></svg></div>');
                 dialog
                     .appendTo(document.body)
                     .dialog({
@@ -50,7 +54,7 @@
                         }
                     });
 
-                KMDoc.modules.mindmap.initMindmap(d3.select(".mindmap"), data);
+                KMDoc.modules.mindmap.initMindmap(".mindmap svg", data);
 
                 if (!options.autoOpen) {
                     dialog.dialog('widget').hide();
@@ -73,18 +77,18 @@
             });
         },
         initMindmap: function(el, data) {
-            markmap(el, data);
+            var mindmap = markmap(el, data, this.options.markmapOptions);
             
-            var nodes = d3.selectAll('.markmap g.node');
+            var nodes = mindmap.svg.selectAll('.markmap-node');
             var toggleHandler = nodes.on('click');
             nodes.on('click', null);
-            nodes.selectAll('circle').on('click', toggleHandler);
+            nodes.selectAll('.markmap-node-circle').on('click', toggleHandler);
             
-            var selector = '.markmap g.node text';
+            var selector = '.markmap-node-text';
             KMDoc.modules.tooltip.initDefinitionDialogTrigger(selector);
             $('body').off('click', selector).off('mouseenter', selector);
             
-            nodes.selectAll('text')
+            nodes.selectAll(selector)
                 .on('mouseenter', function(d) {
                     if (d.isDefinition) {
                         KMDoc.modules.tooltip.openDefinitionDialog(d.textId, d3.event.currentTarget, false);
