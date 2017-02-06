@@ -59,7 +59,7 @@ If you want to link definition to other than default sources (Google, Wikipedia,
 Create some file, e.g. yourfile.js
 
 ```javascript
-var tmpl = _.template('<a href="http://www.bing.com/search?q=<%-name%>" title="Search on Bing" target="_blank"><img class="favicon" src="http://www.bing.com/favicon.ico"></a>'');
+var tmpl = _.template('<a href="http://www.bing.com/search?q=<%-name%>" title="Search on Bing" target="_blank"><img class="favicon" src="http://www.bing.com/favicon.ico"></a>');
 
 KMDoc.modules.tooltip.options.actions.push(tmpl);
 ```

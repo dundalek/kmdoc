@@ -56,10 +56,10 @@ These are common fields of definition. Not all of these fields are yet used, but
 
 Here is a list of metadata, which are currently used and have functional meaning:
 
-**name** - name of the definition and title of the popup
-**definition** - definition and contents of the popup
-**symbol**, **alias** - used for autolinking
-**source** - used to link to source. You can link web pages, PDF, doc and other formats supported by [Google docs viewer](http://docs.google.com/viewer). You can add page number with hash sign to open document at specified page. For example source link lecture.pdf#5 will open the document on page 5. Check out the [shortsource](https://github.com/dundalek/kmdoc/blob/master/doc/modules.md#shortsource) module how to specify sources more easily.
+- **name** - name of the definition and title of the popup
+- **definition** - definition and contents of the popup
+- **symbol**, **alias** - used for autolinking
+- **source** - used to link to source. You can link web pages, PDF, doc and other formats supported by [Google docs viewer](http://docs.google.com/viewer). You can add page number with hash sign to open document at specified page. For example source link lecture.pdf#5 will open the document on page 5. Check out the [shortsource](https://github.com/dundalek/kmdoc/blob/master/doc/modules.md#shortsource) module how to specify sources more easily.
 
 
 ### Helpers
