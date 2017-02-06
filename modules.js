@@ -1,7 +1,12 @@
+// for sqlite wrapper
+require('babel-polyfill');
 
-var fs = require('fs'),
+var fs = require('fs-promise'),
+    path = require('path'),
     _  = require('underscore'),
+    sqlite = require('sqlite/legacy'),
     helpers = require('./helpers');
+
 
 /* == flashcard functionality == */
 var flashcard = function(options) {
@@ -47,7 +52,7 @@ function mindmap(options) {
         });
         var root = markmapTransform(markmapParse(this.input));
         traverseMindmap(root, [], defIndex);
-        
+
         fs.writeFileSync(fileOut, JSON.stringify(root, null, '  '));
     });
     options.mindmapUrl = fileOut;
@@ -79,6 +84,90 @@ function traverseMindmap(node, stack, defIndex) {
         stack.pop();
     }
 }
+
+/* == docset functionality == */
+var docsetTmpl = _.template(`<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>cheatsheet</string>
+	<key>CFBundleName</key>
+	<string><%= title %></string>
+	<key>DashDocSetFamily</key>
+	<string>cheatsheet</string>
+	<key>DashDocSetKeyword</key>
+	<string><%= name %></string>
+	<key>DashDocSetPluginKeyword</key>
+	<string><%= name %></string>
+	<key>DocSetPlatformFamily</key>
+	<string>cheatsheet</string>
+	<key>dashIndexFilePath</key>
+	<string><% indexPath %></string>
+	<key>isDashDocset</key>
+	<true/>
+</dict>
+</plist>
+`);
+
+function docset(options) {
+    this.postprocess(function() {
+        const name = (options.name || this.options.basename);
+        const docpath = name + '.docset';
+        const indexPath = 'index.html';
+        var db;
+
+        fs.exists(docpath)
+          .then((exists) => {
+            if (exists) {
+              return fs.remove(docpath);
+            }
+          })
+          .then(() => fs.mkdirp(docpath + '/Contents/Resources/Documents/styles'))
+          .then(() => fs.writeFile(docpath + '/Contents/Info.plist', docsetTmpl({
+            title: this.options.title,
+            name: name,
+            indexPath: indexPath,
+          })))
+          .then(() => {
+            // only keep stylesheets for static view
+            const styles = this._head.filter(x => x.type === 'style');
+            this._head = styles.map((x, i) => ({
+              type: x.type,
+              value: x.value.match(/^https?:\/\//) ? x.value : './styles/' + i + '-' + path.basename(x.value),
+            }));
+            return Promise.all(styles.map((style, i) => {
+              if (!style.value.match(/^https?:\/\//)) {
+                return fs.copy(style.value, docpath + '/Contents/Resources/Documents/' + this._head[i].value);
+              }
+            }));
+          })
+          .then(() => {
+            const staticOutput = this.options.fileTmpl({
+                options: this.options,
+                head: this._buildAssets(),
+                content: this._applyHelpers(this.input, ['md'])
+            });
+            return fs.writeFile(docpath + '/Contents/Resources/Documents/' + indexPath, staticOutput);
+          })
+          .then(() => sqlite.open(docpath + '/Contents/Resources/docSet.dsidx'))
+          .then(result => db = result)
+          .then(() => db.run('CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);'))
+          .then(() => db.run('CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);'))
+          .then(() => db.prepare('INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);'))
+          .then((stmt) => {
+            return Promise.all(this.definitions.map(d => {
+              return stmt.run(d.name, 'Entry', indexPath + '#' + d.id);
+            }))
+              .then(() => stmt);
+          })
+          .then((stmt) => stmt.finalize())
+          .then(() => db.close())
+          .catch(e => console.error(e))
+    });
+};
+
+
 
 /** @exports KMDoc.modules */
 module.exports = {
@@ -167,7 +256,10 @@ module.exports = {
         this.addScript(this.options.componentsPath+'kmdoc/assets/js/search.js');
     },
     /** Enable mindmaps */
-    mindmap: mindmap
+    mindmap: mindmap,
+    /** Generate docset for Dash/Zeal
+        @method */
+    docset: docset,
 };
 
 var snowballStemmers = {

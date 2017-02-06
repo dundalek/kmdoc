@@ -17,7 +17,10 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "babel-polyfill": "^6.22.0",
+    "fs-promise": "^1.0.0",
+    "jsdoc": "~3.2.1",
     "shelljs": "~0.2.6",
-    "jsdoc": "~3.2.1"
+    "sqlite": "^2.3.0"
   }
 }

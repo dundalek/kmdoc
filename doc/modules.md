@@ -100,3 +100,10 @@ Options:
 - autoOpen: default true
 - autoResize: default false
 - margin: default 50
+
+### docset
+
+Generates docset for [Dash](https://kapeli.com/dash).
+
+Options:
+- name {string}: name of the docset
