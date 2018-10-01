@@ -4,7 +4,7 @@ KMDoc is a software for an intelligent representation of knowledge. It can be us
 
 Knowledge is first written down in plain text and then automatic tool extracts definitions of concepts and creates rich HTML page for viewing in browser, exports flashcards and so on.
 
-See examples:
+See examples (the content of examples can be found in the [knowledge-base](https://github.com/dundalek/knowledge-base) repository):
 
 - [Graph Theory glossary](http://kb.knomaton.org/graph-theory/graph-theory.html) - This example among other features shows useful navigation in nested definitions.
 - [Chinese notes](http://kb.knomaton.org/chinese/out/chinese.html) - Notes from chinese class. Vocabulary can be automatically pronounced using text-to-speech Google API.
