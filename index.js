@@ -18,7 +18,7 @@ function KMDocInst(options) {
     //this.addStyle(this.options.componentsPath+'jquery-ui/themes/cupertino/jquery-ui.css');
     this.addStyle(this.options.componentsPath+'kmdoc/assets/jquery-bootstrap/jquery-ui-1.9.2.custom.css');
 
-    this.addScript('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
+    this.addScript(this.options.componentsPath+'jquery/jquery.min.js');
     this.addScript(this.options.componentsPath+'jquery-ui/ui/jquery-ui.js');
     this.addScript(this.options.componentsPath+'underscore/underscore.js');
     this.addScript(this.options.componentsPath+'kmdoc/assets/js/main.js');

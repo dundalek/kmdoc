@@ -33,8 +33,8 @@ flashcard.generate = function(defs) {
 }
 
 /* == mindmap functionality == */
-var markmapParse = require('markmap/parse.markdown');
-var markmapTransform = require('markmap/transform.headings');
+var markmapParse = require('markmap/lib/parse.markdown');
+var markmapTransform = require('markmap/lib/transform.headings');
 var SEP = '_-__-_';
 
 function mindmap(options) {
@@ -56,9 +56,10 @@ function mindmap(options) {
         fs.writeFileSync(fileOut, JSON.stringify(root, null, '  '));
     });
     options.mindmapUrl = fileOut;
-    this.addStyle(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.css');
-    this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/node_modules/d3/d3.min.js');
-    this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/view.mindmap.js');
+    this.addStyle(this.options.componentsPath+'kmdoc/node_modules/markmap/style/view.mindmap.css');
+    this.addScript(this.options.componentsPath+'kmdoc/node_modules/d3/d3.min.js');
+    this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/lib/d3-flextree.js');
+    this.addScript(this.options.componentsPath+'kmdoc/node_modules/markmap/lib/view.mindmap.js');
     this.addScript(this.options.componentsPath+'kmdoc/assets/js/mindmap.js');
     this.addHead('<script>_.extend(KMDoc.modules.mindmap.options, ' + JSON.stringify(options) + ');</script>');
 }
